@@ -19,7 +19,7 @@ O endereço da Cloudflare **muda toda vez** que você reinicia. Se quiser um fix
 Precisa do [Node.js](https://nodejs.org) 18 ou mais novo, num computador que fique ligado (PC, notebook, mini PC, Raspberry Pi):
 
 ```bash
-cd iptv
+cd IPTV-VAUNA
 node server.js
 ```
 
@@ -29,7 +29,7 @@ O terminal mostra o endereço, algo como `http://192.168.0.10:8787`.
 - **TV LG:** abra o endereço no navegador da TV (app *Web Browser*) e salve nos favoritos. Ela entra sozinha no **Modo TV** e passa a tocar o que você mandar pelo celular. Também dá para navegar direto na TV com as setas e o OK do controle.
 - **Celular como controle remoto:** aba **TVs** → *Usar esta TV*. Depois é só tocar num canal, filme ou episódio e ele toca na TV. Na mesma aba há anterior/próximo, pausa, volume e parar.
 
-Na primeira vez as listas grandes (algumas passam de 30 MB) levam um ou dois minutos para baixar. Depois ficam em cache em `iptv/data/` e atualizam sozinhas a cada 12 h.
+Na primeira vez as listas grandes (algumas passam de 30 MB) levam um ou dois minutos para baixar. Depois ficam em cache em `data/` e atualizam sozinhas a cada 12 h.
 
 ## App instalável na TV LG (webOS)
 
@@ -80,7 +80,7 @@ Sem instalar nada, o navegador da TV com o mesmo endereço funciona igual.
 | Variável | Padrão | Para quê |
 |---|---|---|
 | `PORT` | `8787` | porta do servidor |
-| `DATA_DIR` | `iptv/data` | cache das listas, favoritos e fontes |
+| `DATA_DIR` | `data` | cache das listas, favoritos e fontes |
 | `GITHUB_TOKEN` | — | aumenta o limite da API do GitHub |
 | `IPTV_USER` / `IPTV_PASS` | — | ativa o login |
 | `TRUST_PROXY` | `0` | `1` atrás de proxy HTTPS (Caddy, Cloudflare): usa o IP real e cookie `Secure` |
@@ -96,7 +96,7 @@ Há duas formas de definir usuário e senha (a senha **não** fica no código):
 # A) guardando só o hash em data/auth.json
 node set-login.js Admin 'sua-senha'
 
-# B) por variáveis (ou num arquivo iptv/.env, que o git ignora)
+# B) por variáveis (ou num arquivo .env, que o git ignora)
 IPTV_USER=Admin IPTV_PASS='sua-senha' node server.js
 ```
 
@@ -108,7 +108,7 @@ Para acessar fora do Wi-Fi o servidor precisa de um endereço na internet **com 
 
 1. **Servidor (VPS) com Docker + HTTPS automático** — o mais estável e não depende do seu PC ligado. Qualquer VPS pequena (1 GB) serve. Precisa de um domínio apontando para o IP.
    ```bash
-   git clone https://github.com/vaunass/Porta-retrato.git && cd Porta-retrato/iptv
+   git clone https://github.com/vaunass/IPTV-VAUNA.git && cd IPTV-VAUNA
    printf 'DOMAIN=tv.seudominio.com\nIPTV_USER=Admin\nIPTV_PASS=sua-senha\n' > .env
    docker compose up -d --build
    ```
