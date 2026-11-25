@@ -267,6 +267,7 @@
     });
     h += '<h2 style="margin-top:22px">Ajustes</h2>' +
       '<div class="box"><div class="row"><div class="grow"><b>Passar pelo servidor (recomendado)</b><small>Resolve bloqueios de CORS e links que exigem cabeçalhos. Desligue só se o seu servidor for lento.</small></div>' + sw(cfg.proxy, 'data-act="cfgProxy"') + '</div></div>' +
+      '<div class="box"><div class="row"><div class="grow"><b>Modo leve (animações reduzidas)</b><small>Deixa a abertura e o visual mais simples e rápidos. Liga sozinho na TV; use se algum aparelho travar.</small></div>' + sw(document.documentElement.className.indexOf('lite') >= 0, 'data-act="cfgLite"') + '</div></div>' +
       '<div class="box"><div class="row"><div class="grow"><b>Ocultar canais que falharam</b><small>Esconde o que não abriu da última vez (volta a aparecer se funcionar).</small></div>' + sw(cfg.hideBad, 'data-act="cfgBad"') + '</div></div>';
     $('src').innerHTML = h;
     U.paintIcons($('src'));
@@ -399,7 +400,7 @@
       el.innerHTML = h;
       U.paintIcons(el);
       var rss = el.querySelectorAll('.rs');
-      for (var ri = 0; ri < rss.length; ri++) { var cs = rss[ri].children; for (var ci = 0; ci < cs.length; ci++) cs[ci].style.animationDelay = (Math.min(ci, 12) * 55 + ri * 90) + 'ms'; }
+      if (document.documentElement.className.indexOf('lite') < 0) for (var ri = 0; ri < rss.length; ri++) { var cs = rss[ri].children; for (var ci = 0; ci < cs.length; ci++) cs[ci].style.animationDelay = (Math.min(ci, 12) * 55 + ri * 90) + 'ms'; }
     }).catch(function () {});
   }
 
@@ -469,7 +470,7 @@
     var fin = false;
     function end() { if (fin) return; fin = true; el.classList.add('out'); done(); setTimeout(function () { el.hidden = true; }, 800); }
     el.onclick = end;
-    setTimeout(end, 3300);
+    setTimeout(end, document.documentElement.className.indexOf('lite') >= 0 ? 1800 : 3300);
   }
 
   function paintAvatar() {
@@ -696,6 +697,7 @@
       else if (act === 'toggle') { var on = !a.classList.contains('on'); a.classList.toggle('on', on); api('/api/sources/' + id, { method: 'PATCH', body: { enabled: on } }).then(function () { pollInfo(true); }); }
       else if (act === 'addSrc') addSourceForm();
       else if (act === 'cfgProxy') { cfg.proxy = !cfg.proxy; saveCfg(); a.classList.toggle('on', cfg.proxy); }
+      else if (act === 'cfgLite') { var on2 = !a.classList.contains('on'); a.classList.toggle('on', on2); store.set('lite', on2); document.documentElement.classList.toggle('lite', on2); U.toast(on2 ? 'Modo leve ligado' : 'Modo leve desligado'); }
       else if (act === 'cfgBad') { cfg.hideBad = !cfg.hideBad; saveCfg(); a.classList.toggle('on', cfg.hideBad); }
       else if (act === 'cfgReceiver') { cfg.receiver = !cfg.receiver; if (cfg.receiver) cfg.target = ''; saveCfg(); connect(); paintPill(); renderTvs(); U.toast(cfg.receiver ? 'Modo TV ligado' : 'Modo TV desligado'); }
       else if (act === 'target') { cfg.target = id; saveCfg(); paintPill(); renderTvs(); if (id) U.toast('Agora os canais tocam nessa TV'); }

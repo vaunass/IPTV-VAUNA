@@ -269,17 +269,16 @@ body.tv .grid .card { width: 20%; } body.tv .grid .card.p { width: 14.285%; }
 @keyframes introOut { to { opacity: 0; visibility: hidden; } }
 .beams { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .beams i { width: 3.4vw; height: 0; margin: 0 .5vw; border-radius: 4px; background: linear-gradient(to bottom, transparent, #e50914 35%, #ff3b45 50%, #8a0309 65%, transparent);
-  filter: blur(1.5px); animation: beam 1.9s cubic-bezier(.2,.7,.2,1) forwards; }
+  animation: beam 1.9s cubic-bezier(.2,.7,.2,1) forwards; }
 .beams i:nth-child(1) { animation-delay: .45s; transform: skewX(-10deg); } .beams i:nth-child(2) { animation-delay: .25s; }
 .beams i:nth-child(3) { animation-delay: 0s; width: 6vw; } .beams i:nth-child(4) { animation-delay: .3s; } .beams i:nth-child(5) { animation-delay: .5s; transform: skewX(10deg); }
 @keyframes beam { 0% { height: 0; opacity: 0; } 35% { height: 130vh; opacity: 1; } 70% { opacity: .85; } 100% { height: 130vh; opacity: 0; transform: scaleX(3.5); } }
 .iw { position: relative; z-index: 2; display: flex; font-weight: 900; font-size: clamp(2.2rem, 10.5vw, 9rem); letter-spacing: .05em; white-space: nowrap; color: #e50914;
   animation: zoomThrough 1.2s 2.2s cubic-bezier(.7,0,.9,.4) forwards; }
-.iw b { display: inline-block; font-weight: 900; opacity: 0; text-shadow: 0 0 36px rgba(229,9,20,.7), 0 0 90px rgba(229,9,20,.35);
-  animation: letterIn .75s cubic-bezier(.2,.9,.25,1.25) forwards, glow 1.4s 1.3s ease-in-out; animation-delay: calc(.55s + var(--i) * .07s), 1.3s; }
-@keyframes letterIn { from { opacity: 0; transform: translateY(-.5em) scale(1.6); filter: blur(16px); } to { opacity: 1; transform: none; filter: blur(0); } }
-@keyframes glow { 50% { color: #ff4048; text-shadow: 0 0 60px rgba(255,64,72,.9), 0 0 130px rgba(229,9,20,.6); } }
-@keyframes zoomThrough { to { transform: scale(16); opacity: 0; } }
+.iw b { display: inline-block; font-weight: 900; opacity: 0; text-shadow: 0 0 28px rgba(229,9,20,.55);
+  animation: letterIn .7s cubic-bezier(.2,.9,.25,1.25) forwards; animation-delay: calc(.5s + var(--i) * .07s); }
+@keyframes letterIn { from { opacity: 0; transform: translateY(-.5em) scale(1.5); } to { opacity: 1; transform: none; } }
+@keyframes zoomThrough { to { transform: scale(5); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { #intro { display: none !important; } }
 
 /* ---------- animações gerais ---------- */
@@ -287,7 +286,7 @@ body.tv .grid .card { width: 20%; } body.tv .grid .card.p { width: 14.285%; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(26px) scale(.94); } to { opacity: 1; transform: none; } }
 .rowx .rh h2 { animation: slideIn .5s var(--ease) both; }
 @keyframes slideIn { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
-#hero .bg { animation: heroIn 1.2s var(--ease), kb 32s 1.2s ease-in-out infinite alternate; }
+#hero .bg { animation: heroIn 1.2s var(--ease), kb 32s 1.2s ease-in-out forwards; }
 @keyframes kb { from { transform: scale(1.1); } to { transform: scale(1.24) translate(-1.5%, -1%); } }
 .hb.play { animation: pulse2 2.8s 1.6s ease-in-out 2; }
 @keyframes pulse2 { 50% { box-shadow: 0 0 0 10px rgba(255,255,255,.16); } }
@@ -335,3 +334,19 @@ body.tv .grid .card { width: 20%; } body.tv .grid .card.p { width: 14.285%; }
 @media (min-width: 900px) { .toast { bottom: 32px; } }
 
 #home.nohero { padding-top: calc(var(--nb-h) + 16px); }
+
+/* ---------- modo leve (TVs e aparelhos fracos): sem desfoque, sem animações pesadas ---------- */
+html.lite #hero .bg { filter: none; transform: none; inset: 0; animation: none; box-shadow: inset 0 0 0 100vmax rgba(0,0,0,.38); }
+html.lite #hero .poster, html.lite #hero .info { animation: none; box-shadow: none; }
+html.lite .rs .card:not(.skel), html.lite .rowx .rh h2, html.lite .hb.play, html.lite .pitem .av, html.lite .ban, html.lite .ban .bi, html.lite .sbody,
+html.lite .enter, html.lite #tabs button.on i { animation: none; }
+html.lite .rs { scroll-behavior: auto; scroll-snap-type: none; }
+html.lite .art, html.lite .card, html.lite .chip, html.lite .btn, html.lite .hb, html.lite .circ, html.lite #nb { transition: none; }
+html.lite body.kb .card:focus .art { box-shadow: 0 0 0 3px #fff; transform: scale(1.05); }
+html.lite .wm { text-shadow: none; }
+html.lite .beams { display: none; }
+html.lite .iw { animation: none; }
+html.lite .iw b { text-shadow: none; animation: liteLetter .4s ease-out forwards; animation-delay: calc(.1s + var(--i) * .045s); }
+@keyframes liteLetter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+html.lite #intro.out { animation-duration: .35s; }
+html.lite .art { box-shadow: none; }

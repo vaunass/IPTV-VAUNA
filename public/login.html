@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#000000">
 <title>Entrar · VAUNAFLIX</title>
 <link rel="manifest" href="manifest.webmanifest">
+<script>(function(){try{var q=/[?&]lite=([01])/.exec(location.search),l=localStorage.getItem('iptv.lite');l=l===null?null:JSON.parse(l);if(q)l=q[1]==='1';var tv=/Web0S|webOS|SMART-TV|SmartTV|Tizen|HbbTV|NetCast/i.test(navigator.userAgent);var weak=(navigator.hardwareConcurrency||8)<=2||(navigator.deviceMemory||8)<=2;if(l===null)l=tv||weak;if(l)document.documentElement.className+=' lite';}catch(e){}})();</script>
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/login.css">
 </head>
@@ -28,7 +29,8 @@
 (function () {
   // mural de "pôsteres" animado (só cores, sem imagens externas)
   var wall = document.getElementById('wall'), h = '';
-  for (var i = 0; i < 84; i++) {
+  var lite = /(^| )lite( |$)/.test(document.documentElement.className);
+  for (var i = 0; i < (lite ? 36 : 84); i++) {
     var hue = (i * 47 + (i % 7) * 23) % 360;
     h += '<i style="--h:' + hue + ';--d:' + ((i * 53) % 900) + 'ms"></i>';
   }
