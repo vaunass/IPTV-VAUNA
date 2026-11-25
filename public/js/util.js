@@ -26,6 +26,11 @@
     more: '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
     chev: '<polyline points="9 18 15 12 9 6"/>',
+    rew: '<path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">10</text>',
+    fwd: '<path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">10</text>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>',
     stop: '<rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/>'
   };
 
@@ -43,6 +48,7 @@
   function api(path, opts) {
     opts = opts || {};
     var init = { method: opts.method || 'GET', headers: {} };
+    var pid = store.get('profile', ''); if (pid) init.headers['X-Profile'] = pid;
     if (opts.body !== undefined) { init.method = opts.method || 'POST'; init.body = JSON.stringify(opts.body); init.headers['Content-Type'] = 'application/json'; }
     return fetch(path, init).then(function (r) {
       if (r.status === 401) { location.href = '/login.html?next=' + encodeURIComponent(location.pathname + location.search); throw new Error('login necessário'); }

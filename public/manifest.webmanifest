@@ -1,6 +1,6 @@
 {
-  "name": "Porta IPTV",
-  "short_name": "IPTV",
+  "name": "VAUNAFLIX",
+  "short_name": "VAUNAFLIX",
   "description": "TV ao vivo, filmes e séries no celular e na TV",
   "start_url": "./",
   "scope": "./",

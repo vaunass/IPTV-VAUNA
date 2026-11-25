@@ -161,6 +161,7 @@
   function updateSeek() {
     var show = isVod();
     el('seekRow').hidden = !show;
+    el('bRew').hidden = !show; el('bFwd').hidden = !show;
     if (!show) return;
     if (!updateSeek.drag) el('seek').value = Math.round(vid.currentTime / vid.duration * 1000);
     el('tCur').textContent = U.fmtTime(vid.currentTime);
@@ -305,6 +306,8 @@
     el('bPrev').onclick = function () { go(-1); };
     el('bNext').onclick = function () { go(1); };
     el('bAlt').onclick = nextAlt;
+    el('bRew').onclick = function () { seekBy(-10); };
+    el('bFwd').onclick = function () { seekBy(10); };
     el('bFav').onclick = function () { hooks.toggleFav(S.id); syncUi(); };
     el('bMute').onclick = function () { vid.muted = !vid.muted; syncUi(); };
     el('bFull').onclick = fullscreen;

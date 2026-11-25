@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title Porta IPTV
+title VAUNAFLIX
 cd /d "%~dp0"
 
 where node >nul 2>nul

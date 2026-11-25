@@ -15,6 +15,9 @@
   }
 
   function scopeEl() {
+    var pr = document.getElementById('profiles');
+    var modal0 = document.getElementById('modal');
+    if (pr && !pr.hidden && !(modal0 && !modal0.hidden)) return pr;
     var pl = document.getElementById('player');
     if (pl && !pl.hidden) return pl;
     var modal = document.getElementById('modal');

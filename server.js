@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Porta-Retrato IPTV — servidor local (sem dependências, Node 18+).
+ * VAUNAFLIX — servidor local (sem dependências, Node 18+).
  *
  *   node server.js
  *
@@ -36,7 +36,17 @@ fs.mkdirSync(DATA, { recursive: true });
 
 // ---------- estado persistente (favoritos, recentes, fontes) ----------
 const STATE_FILE = path.join(DATA, 'state.json');
-const state = Object.assign({ fav: [], recent: [], bad: {}, custom: [], enabled: {} }, readJson(STATE_FILE) || {});
+const state = Object.assign({ fav: [], recent: [], bad: {}, custom: [], enabled: {}, profiles: [] }, readJson(STATE_FILE) || {});
+const AVATAR_COLORS = ['#e50914', '#0a84ff', '#f5a623', '#30d158', '#bf5af2', '#ff6482'];
+// perfis (cada um com seus favoritos e "continuar assistindo"); migra o estado antigo
+if (!state.profiles.length) {
+  state.profiles = [{ id: 'p1', name: 'Principal', color: AVATAR_COLORS[0], fav: state.fav || [], recent: state.recent || [] }];
+}
+delete state.fav; delete state.recent;
+function profileOf(req, q) {
+  const id = req.headers['x-profile'] || (q && q.get('profile')) || '';
+  return state.profiles.find(function (p) { return p.id === id; }) || state.profiles[0];
+}
 let saveTimer = null;
 state.save = function () {
   clearTimeout(saveTimer);
@@ -149,6 +159,7 @@ function serveStatic(req, res, pathname) {
 const csv = function (s) { return s ? String(s).split(',').filter(Boolean) : null; };
 
 // ---------- rotas ----------
+let mm0;
 async function route(req, res) {
   const u = new URL(req.url, 'http://x');
   const p = u.pathname;
@@ -186,7 +197,35 @@ async function route(req, res) {
     return res.end();
   }
 
-  if (p === '/api/home' && m === 'GET') return json(req, res, 200, { rows: library.home(state.fav, state.recent) });
+  if (p === '/api/profiles' && m === 'GET') {
+    return json(req, res, 200, { profiles: state.profiles.map(function (x) { return { id: x.id, name: x.name, color: x.color }; }), colors: AVATAR_COLORS });
+  }
+  if (p === '/api/profiles' && m === 'POST') {
+    const b = await readBody(req, 2048);
+    const name = String(b.name || '').trim().slice(0, 20);
+    if (!name) return json(req, res, 400, { error: 'Digite um nome.' });
+    if (state.profiles.length >= 6) return json(req, res, 400, { error: 'Máximo de 6 perfis.' });
+    const np = { id: 'p' + Date.now().toString(36), name: name, color: AVATAR_COLORS.indexOf(b.color) >= 0 ? b.color : AVATAR_COLORS[state.profiles.length % AVATAR_COLORS.length], fav: [], recent: [] };
+    state.profiles.push(np); state.save();
+    return json(req, res, 200, { id: np.id });
+  }
+  mm0 = p.match(/^\/api\/profiles\/([\w-]+)$/);
+  if (mm0 && m === 'PATCH') {
+    const b = await readBody(req, 2048);
+    const t = state.profiles.find(function (x) { return x.id === mm0[1]; });
+    if (!t) return json(req, res, 404, { error: 'perfil não encontrado' });
+    if (b.name !== undefined) { const n = String(b.name).trim().slice(0, 20); if (n) t.name = n; }
+    if (AVATAR_COLORS.indexOf(b.color) >= 0) t.color = b.color;
+    state.save();
+    return json(req, res, 200, { ok: true });
+  }
+  if (mm0 && m === 'DELETE') {
+    if (state.profiles.length <= 1) return json(req, res, 400, { error: 'Mantenha pelo menos um perfil.' });
+    state.profiles = state.profiles.filter(function (x) { return x.id !== mm0[1]; }); state.save();
+    return json(req, res, 200, { ok: true });
+  }
+
+  if (p === '/api/home' && m === 'GET') return json(req, res, 200, library.home(profileOf(req, q).fav, profileOf(req, q).recent));
 
   if (p === '/api/proxy') return handleProxy(req, res, q);
 
@@ -208,7 +247,8 @@ async function route(req, res) {
   }
 
   if (p === '/api/items' && m === 'GET') {
-    const ids = q.get('fav') ? state.fav.slice().reverse() : q.get('recent') ? state.recent : null;
+    const prof = profileOf(req, q);
+    const ids = q.get('fav') ? prof.fav.slice().reverse() : q.get('recent') ? prof.recent : null;
     const hide = q.get('hide') ? new Set(Object.keys(state.bad)) : null;
     return json(req, res, 200, library.query({
       k: q.get('k') || 'l', g: q.get('g') || '', src: q.get('src') || '', q: q.get('q') || '',
@@ -232,24 +272,27 @@ async function route(req, res) {
   }
 
   if (p === '/api/state' && m === 'GET') {
-    return json(req, res, 200, { fav: state.fav, recent: state.recent, bad: state.bad });
+    const pr = profileOf(req, q);
+    return json(req, res, 200, { fav: pr.fav, recent: pr.recent, bad: state.bad });
   }
 
   if (p === '/api/fav' && m === 'POST') {
     const b = await readBody(req, 4096);
     const id = String(b.id || '');
-    const i = state.fav.indexOf(id);
-    if (b.on && i < 0) state.fav.push(id);
-    if (!b.on && i >= 0) state.fav.splice(i, 1);
+    const pf = profileOf(req, q);
+    const i = pf.fav.indexOf(id);
+    if (b.on && i < 0) pf.fav.push(id);
+    if (!b.on && i >= 0) pf.fav.splice(i, 1);
     state.save();
-    broadcast('state', { fav: state.fav });
-    return json(req, res, 200, { fav: state.fav });
+    clients.forEach(function (c) { if (c.profile === pf.id) send(c, 'state', { fav: pf.fav }); });
+    return json(req, res, 200, { fav: pf.fav });
   }
 
   if (p === '/api/recent' && m === 'POST') {
     const b = await readBody(req, 4096);
     const id = String(b.id || '');
-    state.recent = [id].concat(state.recent.filter(function (x) { return x !== id; })).slice(0, 60);
+    const pr2 = profileOf(req, q);
+    pr2.recent = [id].concat(pr2.recent.filter(function (x) { return x !== id; })).slice(0, 60);
     state.save();
     return json(req, res, 200, { ok: true });
   }
@@ -304,7 +347,7 @@ async function route(req, res) {
     res.write('retry: 3000\n\n');
     const old = clients.get(id);
     if (old) { try { old.res.end(); } catch (e) { /* ok */ } }
-    const c = { id: id, name: (q.get('name') || 'TV').slice(0, 40), role: q.get('role') === 'receiver' ? 'receiver' : 'controller', res: res, state: null };
+    const c = { id: id, name: (q.get('name') || 'TV').slice(0, 40), role: q.get('role') === 'receiver' ? 'receiver' : 'controller', res: res, state: null, profile: profileOf(req, q).id };
     clients.set(id, c);
     send(c, 'hello', { id: id, devices: deviceList() });
     broadcast('devices', deviceList());

@@ -1,6 +1,6 @@
-# Porta IPTV
+# VAUNAFLIX
 
-TV ao vivo, filmes e séries no **celular** e na **TV LG**, tudo pelo Wi-Fi de casa.
+Streaming pessoal com cara de app: tela de login animada, escolha de perfil, abertura animada, destaque do dia, fileiras com Top 10 e detalhes de filmes e séries. Roda no **celular** e na **TV LG**, tudo pelo Wi-Fi de casa.
 Um servidor leve (Node.js, sem dependências) baixa as listas M3U, junta tudo numa biblioteca única e serve o app. O celular e a TV só abrem o endereço no navegador.
 
 ## Início rápido no seu PC (Windows, Mac ou Linux)
@@ -33,13 +33,13 @@ Na primeira vez as listas grandes (algumas passam de 30 MB) levam um ou dois min
 
 ## App instalável na TV LG (webOS)
 
-O pacote pronto está em `webos-dist/com.portaiptv.app_1.0.0_all.ipk`. Ele é só um atalho: na primeira vez pede o endereço do servidor (ex.: `192.168.0.10:8787`), guarda e abre o Porta IPTV em Modo TV nas próximas vezes.
+O pacote pronto está em `webos-dist/com.vaunaflix.app_1.0.0_all.ipk`. Ele é só um atalho: na primeira vez pede o endereço do servidor (ex.: `192.168.0.10:8787`), guarda e abre o VAUNAFLIX em Modo TV nas próximas vezes.
 
 1. Na TV, instale o app **Developer Mode** (LG Content Store), crie/entre numa conta de desenvolvedor LG e ligue o *Dev Mode Status* e o *Key Server*. A TV mostra o IP e a senha.
 2. No computador: `npm i -g @webos-tools/cli`
 3. `ares-setup-device --add tv --info "{'host':'IP_DA_TV','port':'9922','username':'prisoner'}"` (a TV pede a chave: `ares-novacom --device tv --getkey`, senha do Key Server).
-4. `ares-install --device tv webos-dist/com.portaiptv.app_1.0.0_all.ipk`
-5. Abra **Porta IPTV** na lista de apps. O Dev Mode precisa ser renovado a cada ~50 horas de uso (limite da LG para apps fora da loja).
+4. `ares-install --device tv webos-dist/com.vaunaflix.app_1.0.0_all.ipk`
+5. Abra **VAUNAFLIX** na lista de apps. O Dev Mode precisa ser renovado a cada ~50 horas de uso (limite da LG para apps fora da loja).
 
 Para refazer o pacote: `ares-package webos -o webos-dist`.
 

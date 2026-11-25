@@ -1,10 +1,10 @@
 {
-  "id": "com.portaiptv.app",
+  "id": "com.vaunaflix.app",
   "version": "1.0.0",
-  "vendor": "Porta IPTV",
+  "vendor": "VAUNAFLIX",
   "type": "web",
   "main": "index.html",
-  "title": "Porta IPTV",
+  "title": "VAUNAFLIX",
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",
   "bgColor": "#0a0e1a",
